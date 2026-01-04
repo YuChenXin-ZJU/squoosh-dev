@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "squoosh-Desktop",
+  "name": "Squoosh-Desktop",
   "version": "0.9.0",
   "license": "apache-2.0",
   "main": "electron/main.js",
@@ -11,7 +11,7 @@
     "watch": "rollup -cw",
     "serve": "serve --listen=$DEV_PORT --config ../../../serve.json .tmp/build/static",
     "desktop:dev": "npm run build && electron .",
-    "desktop:dist": "npm run build && electron-builder --config.directories.output=release-desktop",
+    "desktop:dist": "npm run build && electron-builder --config.directories.output=release-Squoosh-Desktop",
     "prepare": "husky install"
   },
   "devDependencies": {
@@ -56,7 +56,7 @@
   },
   "build": {
     "appId": "app.squoosh.desktop",
-    "productName": "Squoosh Desktop",
+    "productName": "Squoosh-Desktop",
     "directories": {
       "output": "dist"
     },

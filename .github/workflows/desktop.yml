@@ -31,5 +31,4 @@ jobs:
         with:
           name: dist-${{ matrix.os }}
           path: |
-            dist/**
-            dist-desktop/**
+            release-Squoosh-Desktop/**

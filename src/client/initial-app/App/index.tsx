@@ -180,7 +180,7 @@ export default class App extends Component<Props, State> {
           ) : (
             <div class={style.home}>
               <div class={style.homeCard}>
-                <div class={style.homeTitle}>Squoosh Desktop</div>
+                <div class={style.homeTitle}>Squoosh-Desktop</div>
                 <div class={style.homeActions}>
                   <button
                     class={style.homeButton}

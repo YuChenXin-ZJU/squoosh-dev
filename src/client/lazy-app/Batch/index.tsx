@@ -261,7 +261,7 @@ export default class Batch extends Component<Props, State> {
     ).then((entries) => {
       for (const entry of entries) zipInput[entry.name] = entry.bytes;
       zipInput['README.txt'] = strToU8(
-        `Created by Squoosh Desktop\nFiles: ${files.length}\n`,
+        `Created by Squoosh-Desktop\nFiles: ${files.length}\n`,
       );
 
       const zipped = zipSync(zipInput, { level: 6 });
@@ -269,7 +269,7 @@ export default class Batch extends Component<Props, State> {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `squoosh-${Date.now()}.zip`;
+      a.download = `Squoosh-Desktop-${Date.now()}.zip`;
       a.click();
       setTimeout(() => URL.revokeObjectURL(url), 10_000);
     });

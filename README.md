@@ -1,6 +1,6 @@
-# squoosh-Desktop（桌面版图片压缩工具）
+# Squoosh-Desktop（桌面版图片压缩工具）
 
-squoosh-Desktop 是一个离线优先的图片压缩/转码桌面应用（Windows 可用），支持多种编码格式与参数调节，并提供压缩前后对比预览。
+Squoosh-Desktop 是一个离线优先的图片压缩/转码桌面应用（Windows 可用），支持多种编码格式与参数调节，并提供压缩前后对比预览。
 
 本项目基于 Google 的开源项目 Squoosh（二次开发与桌面化封装），用于将 Squoosh 的核心能力以桌面应用形式交付。
 
@@ -15,10 +15,10 @@ squoosh-Desktop 是一个离线优先的图片压缩/转码桌面应用（Window
 
 若你是普通用户，推荐从项目 Releases 下载：
 
-- 安装版（NSIS）：`Squoosh Desktop Setup <version>.exe`
-- 免安装版（Portable）：`Squoosh Desktop <version>.exe`
+- 安装版（NSIS）：`Squoosh-Desktop Setup <version>.exe`
+- 免安装版（Portable）：`Squoosh-Desktop <version>.exe`
 
-如果你是从源码本地打包，构建产物默认输出到 `release-desktop/` 目录。
+如果你是从源码本地打包，构建产物默认输出到 `release-Squoosh-Desktop/` 目录。
 
 ## 使用方法
 
@@ -55,7 +55,7 @@ npm run desktop:dev
 npm run desktop:dist
 ```
 
-构建完成后，产物位于 `release-desktop/`。
+构建完成后，产物位于 `release-Squoosh-Desktop/`。
 
 ## 开源声明与致谢
 
