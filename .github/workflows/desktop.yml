@@ -55,7 +55,7 @@ jobs:
           if gh release view "$TAG" >/dev/null 2>&1; then
             echo "Release exists: $TAG"
           else
-            gh release create "$TAG" --title "$TAG" --generate-notes
+            gh release create "$TAG" --title "$TAG" --notes "Automated desktop build."
           fi
 
           mapfile -t ASSETS < <(
