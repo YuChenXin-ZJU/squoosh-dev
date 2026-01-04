@@ -1,9 +1,26 @@
 .select {
   position: relative;
+  --select-bg: var(--black);
+  --select-fg: var(--white);
+  --select-border: transparent;
+  --select-bg-large: var(--dark-gray);
+  --select-option-bg: var(--black);
+  --select-option-fg: var(--white);
+}
+
+@media (prefers-color-scheme: light) {
+  .select {
+    --select-bg: rgba(15, 18, 32, 0.06);
+    --select-fg: rgba(15, 18, 32, 0.92);
+    --select-border: rgba(15, 18, 32, 0.14);
+    --select-bg-large: rgba(15, 18, 32, 0.06);
+    --select-option-bg: #fff;
+    --select-option-fg: rgba(15, 18, 32, 0.92);
+  }
 }
 
 .builtin-select {
-  background: var(--black);
+  background: var(--select-bg);
   border-radius: 4px;
   font: inherit;
   padding: 7px 0;
@@ -11,9 +28,19 @@
   padding-left: 10px;
   -webkit-appearance: none;
   -moz-appearance: none;
-  border: none;
-  color: #fff;
+  border: 1px solid var(--select-border);
+  color: var(--select-fg);
   width: 100%;
+}
+
+.builtin-select:focus-visible {
+  outline: 2px solid var(--main-theme-color, var(--pink));
+  outline-offset: 2px;
+}
+
+.builtin-select option {
+  background: var(--select-option-bg);
+  color: var(--select-option-fg);
 }
 
 .arrow {
@@ -21,14 +48,14 @@
   right: 8px;
   top: 50%;
   transform: translateY(-50%);
-  fill: #fff;
+  color: var(--select-fg);
   width: 10px;
   pointer-events: none;
 }
 
 .large {
   padding: 10px 35px 10px 10px;
-  background: var(--dark-gray);
+  background: var(--select-bg-large);
 
   & .arrow {
     right: 13px;

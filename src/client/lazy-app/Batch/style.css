@@ -139,6 +139,18 @@
   padding: 12px;
   display: grid;
   gap: 6px;
+  transition: transform 140ms ease, border-color 160ms ease, background-color 160ms ease;
+}
+
+.item:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+@media (prefers-color-scheme: light) {
+  .item:hover {
+    border-color: rgba(15, 18, 32, 0.18);
+  }
 }
 
 .row {
