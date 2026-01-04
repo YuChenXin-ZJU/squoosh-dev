@@ -62,7 +62,11 @@ jobs:
           mapfile -t ASSETS < <(
             find dist -type f \
               ! -path '*/release-Squoosh-Desktop/*/win-unpacked/*' \
-              \( -name '*.exe' -o -name '*.dmg' \)
+              \( \
+                -name 'Squoosh-Desktop.Setup.*.exe' -o \
+                -name 'Squoosh-Desktop.*.exe' -o \
+                -name 'Squoosh-Desktop-*.dmg' \
+              \)
           )
 
           if [ "${#ASSETS[@]}" -eq 0 ]; then
