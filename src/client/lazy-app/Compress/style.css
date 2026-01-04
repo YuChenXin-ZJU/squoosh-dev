@@ -103,13 +103,29 @@
   }
 }
 
+.header-actions {
+  grid-area: header;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 9px;
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+
+  & > * {
+    pointer-events: auto;
+  }
+
+  @media (min-width: 600px) {
+    padding: 14px;
+  }
+}
+
 .back {
   composes: unbutton from global;
   position: relative;
-  grid-area: header;
-  margin: 9px;
-  justify-self: start;
-  align-self: start;
+  margin: 0;
 
   & > svg {
     width: 47px;
@@ -123,12 +139,38 @@
   }
 
   @media (min-width: 600px) {
-    margin: 14px;
-
     & > svg {
       width: 58px;
     }
   }
+}
+
+.lang {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(0, 0, 0, 0.22);
+  color: rgba(255, 255, 255, 0.92);
+  padding: 7px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1;
+  transition: transform 120ms ease, background-color 160ms ease,
+    border-color 160ms ease;
+}
+
+.lang:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.lang:not(:disabled):active {
+  transform: translateY(1px);
+}
+
+.lang:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.9);
+  outline-offset: 2px;
 }
 
 @keyframes strokePulse {

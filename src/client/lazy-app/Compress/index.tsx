@@ -10,7 +10,11 @@ import {
   canDecodeImageType,
   abortable,
   assertSignal,
+  getLocale,
   ImageMimeTypes,
+  onLocaleChange,
+  t,
+  toggleLocale,
 } from '../util';
 import {
   PreprocessorState,
@@ -32,6 +36,7 @@ import WorkerBridge from '../worker-bridge';
 import { resize } from 'features/processors/resize/client';
 import type SnackBarElement from 'shared/custom-els/snack-bar';
 import { drawableToImageData } from '../util/canvas';
+import type { Locale } from '../util';
 
 export type OutputType = EncoderType | 'identity';
 
@@ -71,6 +76,7 @@ interface State {
   mobileView: boolean;
   preprocessorState: PreprocessorState;
   encodedPreprocessorState?: PreprocessorState;
+  locale: Locale;
 }
 
 interface MainJob {
@@ -315,6 +321,7 @@ export default class Compress extends Component<Props, State> {
           },
     ],
     mobileView: this.widthQuery.matches,
+    locale: getLocale(),
   };
 
   private readonly encodeCache = new ResultCache();
@@ -326,6 +333,7 @@ export default class Compress extends Component<Props, State> {
   private sideAbortControllers = [new AbortController(), new AbortController()];
   /** For debouncing calls to updateImage for each side. */
   private updateImageTimeout?: number;
+  private removeLocaleListener?: () => void;
 
   constructor(props: Props) {
     super(props);
@@ -334,6 +342,12 @@ export default class Compress extends Component<Props, State> {
     this.queueUpdateImage({ immediate: true });
 
     import('../sw-bridge').then(({ mainAppLoaded }) => mainAppLoaded());
+  }
+
+  componentDidMount(): void {
+    this.removeLocaleListener = onLocaleChange((locale) => {
+      this.setState({ locale });
+    });
   }
 
   private onMobileWidthChange = () => {
@@ -389,6 +403,7 @@ export default class Compress extends Component<Props, State> {
   }
 
   componentWillUnmount(): void {
+    this.removeLocaleListener?.();
     updateDocumentTitle({ loading: false });
     this.widthQuery.removeListener(this.onMobileWidthChange);
     this.mainAbortController.abort();
@@ -920,7 +935,7 @@ export default class Compress extends Component<Props, State> {
 
   render(
     { onBack }: Props,
-    { loading, sides, source, mobileView, preprocessorState }: State,
+    { loading, sides, source, mobileView, preprocessorState, locale }: State,
   ) {
     const [leftSide, rightSide] = sides;
     const [leftImageData, rightImageData] = sides.map((i) => i.data);
@@ -947,11 +962,12 @@ export default class Compress extends Component<Props, State> {
         imageFile={side.file}
         source={source}
         loading={loading || side.loading}
+        locale={locale}
         flipSide={mobileView || index === 1}
         typeLabel={
           side.latestSettings.encoderState
             ? encoderMap[side.latestSettings.encoderState.type].meta.label
-            : `${side.file ? `${side.file.name}` : 'Original Image'}`
+            : `${side.file ? `${side.file.name}` : t(locale, { zh: '原图', en: 'Original image' })}`
         }
       />
     ));
@@ -981,19 +997,29 @@ export default class Compress extends Component<Props, State> {
           preprocessorState={preprocessorState}
           onPreprocessorChange={this.onPreprocessorChange}
         />
-        <button class={style.back} onClick={onBack}>
-          <svg viewBox="0 0 61 53.3">
-            <title>Back</title>
-            <path
-              class={style.backBlob}
-              d="M0 25.6c-.5-7.1 4.1-14.5 10-19.1S23.4.1 32.2 0c8.8 0 19 1.6 24.4 8s5.6 17.8 1.7 27a29.7 29.7 0 01-20.5 18c-8.4 1.5-17.3-2.6-24.5-8S.5 32.6.1 25.6z"
-            />
-            <path
-              class={style.backX}
-              d="M41.6 17.1l-2-2.1-8.3 8.2-8.2-8.2-2 2 8.2 8.3-8.3 8.2 2.1 2 8.2-8.1 8.3 8.2 2-2-8.2-8.3z"
-            />
-          </svg>
-        </button>
+        <div class={style.headerActions}>
+          <button class={style.back} onClick={onBack} title={t(locale, { zh: '返回', en: 'Back' })}>
+            <svg viewBox="0 0 61 53.3">
+              <title>{t(locale, { zh: '返回', en: 'Back' })}</title>
+              <path
+                class={style.backBlob}
+                d="M0 25.6c-.5-7.1 4.1-14.5 10-19.1S23.4.1 32.2 0c8.8 0 19 1.6 24.4 8s5.6 17.8 1.7 27a29.7 29.7 0 01-20.5 18c-8.4 1.5-17.3-2.6-24.5-8S.5 32.6.1 25.6z"
+              />
+              <path
+                class={style.backX}
+                d="M41.6 17.1l-2-2.1-8.3 8.2-8.2-8.2-2 2 8.2 8.3-8.3 8.2 2.1 2 8.2-8.1 8.3 8.2 2-2-8.2-8.3z"
+              />
+            </svg>
+          </button>
+          <button
+            class={style.lang}
+            type="button"
+            onClick={() => this.setState({ locale: toggleLocale() })}
+            aria-label={t(locale, { zh: '切换到英文', en: 'Switch to Chinese' })}
+          >
+            {locale === 'zh' ? '中文' : 'EN'}
+          </button>
+        </div>
         {mobileView ? (
           <div class={style.options}>
             <multi-panel class={style.multiPanel} open-one-only>

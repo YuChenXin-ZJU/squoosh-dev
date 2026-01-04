@@ -5,6 +5,8 @@ import type { SnackOptions } from 'shared/custom-els/snack-bar';
 import { h, Component } from 'preact';
 
 import { linkRef } from 'shared/prerendered-app/util';
+import { getLocale, onLocaleChange, toggleLocale, t } from 'client/lazy-app/util';
+import type { Locale } from 'client/lazy-app/util';
 import * as style from './style.css';
 import 'add-css:./style.css';
 import 'file-drop-element';
@@ -26,6 +28,7 @@ interface Props {}
 
 interface State {
   awaitingShareTarget: boolean;
+  locale: Locale;
   file?: File;
   batchFiles?: File[];
   isEditorOpen: Boolean;
@@ -39,6 +42,7 @@ export default class App extends Component<Props, State> {
     awaitingShareTarget: new URL(location.href).searchParams.has(
       'share-target',
     ),
+    locale: getLocale(),
     isEditorOpen: false,
     isBatchOpen: false,
     file: undefined,
@@ -50,6 +54,7 @@ export default class App extends Component<Props, State> {
   snackbar?: SnackBarElement;
   singleFileInput?: HTMLInputElement;
   multiFileInput?: HTMLInputElement;
+  private removeLocaleListener?: () => void;
 
   constructor() {
     super();
@@ -89,6 +94,17 @@ export default class App extends Component<Props, State> {
     });
 
     window.addEventListener('popstate', this.onPopState);
+  }
+
+  componentDidMount() {
+    this.removeLocaleListener = onLocaleChange((locale) => {
+      this.setState({ locale });
+    });
+  }
+
+  componentWillUnmount() {
+    this.removeLocaleListener?.();
+    window.removeEventListener('popstate', this.onPopState);
   }
 
   private onFileDrop = ({ files }: FileDropEvent) => {
@@ -159,7 +175,16 @@ export default class App extends Component<Props, State> {
 
   render(
     {}: Props,
-    { file, batchFiles, isEditorOpen, isBatchOpen, Compress, Batch, awaitingShareTarget }: State,
+    {
+      file,
+      batchFiles,
+      isEditorOpen,
+      isBatchOpen,
+      Compress,
+      Batch,
+      awaitingShareTarget,
+      locale,
+    }: State,
   ) {
     const showSpinner =
       awaitingShareTarget ||
@@ -181,9 +206,21 @@ export default class App extends Component<Props, State> {
             <div class={style.home}>
               <div class={style.homeShell}>
                 <header class={style.homeHeader}>
-                  <div class={style.homeKicker}>IMAGE OPTIMIZER</div>
+                  <div class={style.homeTopRow}>
+                    <div class={style.homeKicker}>IMAGE OPTIMIZER</div>
+                    <button
+                      class={style.langButton}
+                      type="button"
+                      onClick={() => this.setState({ locale: toggleLocale() })}
+                      aria-label={t(locale, { zh: '切换到英文', en: 'Switch to Chinese' })}
+                    >
+                      {locale === 'zh' ? '中文' : 'EN'}
+                    </button>
+                  </div>
                   <div class={style.homeTitle}>Squoosh-Desktop</div>
-                  <div class={style.homeDeck}>压缩、对比、批量导出</div>
+                  <div class={style.homeDeck}>
+                    {t(locale, { zh: '压缩、对比、批量导出', en: 'Compress, compare, batch export' })}
+                  </div>
                 </header>
                 <div class={style.homeRule} />
                 <div class={style.homeActions}>
@@ -192,17 +229,19 @@ export default class App extends Component<Props, State> {
                     type="button"
                     onClick={() => this.singleFileInput?.click()}
                   >
-                    选择单张
+                    {t(locale, { zh: '选择单张', en: 'Select one' })}
                   </button>
                   <button
                     class={style.homeButton}
                     type="button"
                     onClick={() => this.multiFileInput?.click()}
                   >
-                    选择多张
+                    {t(locale, { zh: '选择多张', en: 'Select multiple' })}
                   </button>
                 </div>
-                <div class={style.homeHint}>也可以直接拖拽文件到窗口</div>
+                <div class={style.homeHint}>
+                  {t(locale, { zh: '也可以直接拖拽文件到窗口', en: 'You can also drag files into the window' })}
+                </div>
                 <input
                   ref={linkRef(this, 'singleFileInput')}
                   class={style.hiddenInput}

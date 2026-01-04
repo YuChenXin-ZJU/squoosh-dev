@@ -4,12 +4,17 @@ import * as style from './style.css';
 import 'add-css:./style.css';
 
 import WorkerBridge from '../worker-bridge';
+import type { Locale } from '../util';
 import {
   abortable,
   assertSignal,
   builtinDecode,
   canDecodeImageType,
+  getLocale,
+  onLocaleChange,
   sniffMimeType,
+  t,
+  toggleLocale,
 } from '../util';
 import { EncoderType, encoderMap } from '../feature-meta';
 import { zipSync, strToU8 } from 'fflate';
@@ -33,6 +38,7 @@ interface Props {
 
 interface State {
   items: BatchItem[];
+  locale: Locale;
   encoderType: EncoderType;
   compression?: number;
   running: boolean;
@@ -100,6 +106,7 @@ async function decodeImage(
 export default class Batch extends Component<Props, State> {
   private abortController?: AbortController;
   private workerBridge = new WorkerBridge();
+  private removeLocaleListener?: () => void;
 
   state: State = {
     items: this.props.files.map((file) => ({
@@ -108,12 +115,20 @@ export default class Batch extends Component<Props, State> {
       status: 'pending',
       progress: 0,
     })),
+    locale: getLocale(),
     encoderType: getDefaultEncoderType(),
     compression: defaultCompressionForEncoder(getDefaultEncoderType()),
     running: false,
   };
 
+  componentDidMount() {
+    this.removeLocaleListener = onLocaleChange((locale) => {
+      this.setState({ locale });
+    });
+  }
+
   componentWillUnmount() {
+    this.removeLocaleListener?.();
     this.abort();
     for (const item of this.state.items) {
       if (item.downloadUrl) URL.revokeObjectURL(item.downloadUrl);
@@ -275,7 +290,7 @@ export default class Batch extends Component<Props, State> {
     });
   };
 
-  render({ onBack }: Props, { items, encoderType, running }: State) {
+  render({ onBack }: Props, { items, encoderType, running, locale }: State) {
     const total = items.length;
     const done = items.filter((i) => i.status === 'done').length;
     const error = items.filter((i) => i.status === 'error').length;
@@ -284,31 +299,40 @@ export default class Batch extends Component<Props, State> {
       <div class={style.page}>
         <div class={style.shell}>
           <div class={style.topbar}>
-            <div class={style.title}>批量压缩</div>
+            <div class={style.title}>
+              {t(locale, { zh: '批量压缩', en: 'Batch compress' })}
+            </div>
             <div class={style.actions}>
               <button class={style.button} onClick={onBack} disabled={running}>
-                返回
+                {t(locale, { zh: '返回', en: 'Back' })}
               </button>
               <button class={style.button} onClick={this.reset} disabled={running}>
-                重置
+                {t(locale, { zh: '重置', en: 'Reset' })}
               </button>
               <button
                 class={style.button}
                 onClick={this.downloadAllZip}
                 disabled={running || done === 0}
               >
-                下载全部(zip)
+                {t(locale, { zh: '下载全部(zip)', en: 'Download all (zip)' })}
+              </button>
+              <button
+                class={style.button}
+                type="button"
+                onClick={() => this.setState({ locale: toggleLocale() })}
+              >
+                {locale === 'zh' ? '中文' : 'EN'}
               </button>
               {running ? (
                 <button class={style.button} onClick={this.abort}>
-                  停止
+                  {t(locale, { zh: '停止', en: 'Stop' })}
                 </button>
               ) : (
                 <button
                   class={`${style.button} ${style.buttonPrimary}`}
                   onClick={this.run}
                 >
-                  开始
+                  {t(locale, { zh: '开始', en: 'Start' })}
                 </button>
               )}
             </div>
@@ -316,7 +340,9 @@ export default class Batch extends Component<Props, State> {
 
           <div class={style.controls}>
             <label class={style.control}>
-              <span class={style.controlLabel}>输出格式</span>
+              <span class={style.controlLabel}>
+                {t(locale, { zh: '输出格式', en: 'Output format' })}
+              </span>
               <select
                 class={style.select}
                 value={encoderType}
@@ -329,7 +355,9 @@ export default class Batch extends Component<Props, State> {
             </label>
             {this.shouldShowCompression() && (
               <label class={style.control}>
-                <span class={style.controlLabel}>压缩强度</span>
+                <span class={style.controlLabel}>
+                  {t(locale, { zh: '压缩强度', en: 'Compression' })}
+                </span>
                 <input
                   class={style.range}
                   type="range"
@@ -340,18 +368,29 @@ export default class Batch extends Component<Props, State> {
                 />
                 <span class={style.controlValue}>
                   {this.state.compression ?? defaultCompressionForEncoder(encoderType) ?? 0}
-                  {this.derivedQuality() != null ? `（质量 ${this.derivedQuality()}）` : ''}
+                  {this.derivedQuality() != null
+                    ? t(locale, {
+                        zh: `（质量 ${this.derivedQuality()}）`,
+                        en: ` (quality ${this.derivedQuality()})`,
+                      })
+                    : ''}
                 </span>
               </label>
             )}
             <div class={`${style.meta} ${style.summary}`}>
-              总计 {total}，完成 {done}，失败 {error}
+              {t(locale, { zh: '总计', en: 'Total' })} {total}，{t(locale, { zh: '完成', en: 'Done' })}{' '}
+              {done}，{t(locale, { zh: '失败', en: 'Failed' })} {error}
             </div>
           </div>
 
           <div class={style.content}>
             {items.length === 0 ? (
-              <div class={style.empty}>拖拽多张图片到首页后进入这里</div>
+              <div class={style.empty}>
+                {t(locale, {
+                  zh: '拖拽多张图片到首页后进入这里',
+                  en: 'Drag multiple images on the home page to enter here',
+                })}
+              </div>
             ) : (
               <div class={style.list}>
                 {items.map((item) => (
@@ -360,18 +399,26 @@ export default class Batch extends Component<Props, State> {
                       <div>{item.file.name}</div>
                       <div class={style.status}>
                         {item.status === 'pending'
-                          ? '待处理'
+                          ? t(locale, { zh: '待处理', en: 'Pending' })
                           : item.status === 'processing'
-                            ? '处理中'
+                            ? t(locale, { zh: '处理中', en: 'Processing' })
                             : item.status === 'done'
-                              ? '完成'
-                              : '失败'}
+                              ? t(locale, { zh: '完成', en: 'Done' })
+                              : t(locale, { zh: '失败', en: 'Failed' })}
                       </div>
                     </div>
                     <div class={style.row}>
                       <div class={style.meta}>
-                        原始 {prettyBytes(item.file.size)}
-                        {item.outputFile ? ` → 输出 ${prettyBytes(item.outputFile.size)}` : ''}
+                        {t(locale, { zh: '原始', en: 'Original' })}{' '}
+                        {prettyBytes(item.file.size)}
+                        {item.outputFile
+                          ? ` → ${t(locale, { zh: '输出', en: 'Output' })} ${prettyBytes(
+                              item.outputFile.size,
+                            )} ${t(locale, {
+                              zh: `（占原图 ${Math.round((item.outputFile.size / item.file.size) * 100)}%）`,
+                              en: `(${Math.round((item.outputFile.size / item.file.size) * 100)}% of original)`,
+                            })}`
+                          : ''}
                       </div>
                       <div>
                         <button
@@ -379,7 +426,7 @@ export default class Batch extends Component<Props, State> {
                           onClick={() => this.downloadItem(item)}
                           disabled={!item.outputFile}
                         >
-                          下载
+                          {t(locale, { zh: '下载', en: 'Download' })}
                         </button>
                       </div>
                     </div>

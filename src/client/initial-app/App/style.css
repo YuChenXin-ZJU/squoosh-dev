@@ -125,6 +125,40 @@
   gap: 6px;
 }
 
+.home-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.lang-button {
+  appearance: none;
+  border: 1px solid var(--button-border);
+  background: var(--button-bg);
+  color: var(--button-fg);
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  transition: transform 120ms ease, background-color 160ms ease,
+    border-color 160ms ease;
+}
+
+.lang-button:hover {
+  background: var(--button-bg-hover);
+}
+
+.lang-button:not(:disabled):active {
+  transform: translateY(1px);
+}
+
+.lang-button:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
 .home-kicker {
   font-size: 11px;
   letter-spacing: 0.12em;

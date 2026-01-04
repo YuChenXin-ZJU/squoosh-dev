@@ -17,6 +17,51 @@ export const isSafari =
   /Safari\//.test(navigator.userAgent) &&
   !/Chrom(e|ium)\//.test(navigator.userAgent);
 
+export type Locale = 'zh' | 'en';
+
+const LOCALE_STORAGE_KEY = 'squoosh-desktop-locale';
+const LOCALE_EVENT = 'squoosh-locale-change';
+
+export function getLocale(): Locale {
+  try {
+    const stored = localStorage.getItem(LOCALE_STORAGE_KEY);
+    if (stored === 'zh' || stored === 'en') return stored;
+  } catch {}
+  return /^zh\b/i.test(navigator.language || '') ? 'zh' : 'en';
+}
+
+export function setLocale(locale: Locale) {
+  try {
+    localStorage.setItem(LOCALE_STORAGE_KEY, locale);
+  } catch {}
+  window.dispatchEvent(
+    new CustomEvent(LOCALE_EVENT, {
+      detail: { locale },
+    }),
+  );
+}
+
+export function toggleLocale(): Locale {
+  const next: Locale = getLocale() === 'zh' ? 'en' : 'zh';
+  setLocale(next);
+  return next;
+}
+
+export function onLocaleChange(handler: (locale: Locale) => void) {
+  const listener = (event: Event) => {
+    const e = event as CustomEvent<{ locale?: Locale }>;
+    const locale = e.detail?.locale;
+    if (locale === 'zh' || locale === 'en') handler(locale);
+  };
+  window.addEventListener(LOCALE_EVENT, listener as EventListener);
+  return () =>
+    window.removeEventListener(LOCALE_EVENT, listener as EventListener);
+}
+
+export function t(locale: Locale, strings: { zh: string; en: string }) {
+  return locale === 'zh' ? strings.zh : strings.en;
+}
+
 /**
  * Compare two objects, returning a boolean indicating if
  * they have the same properties and strictly equal values.
