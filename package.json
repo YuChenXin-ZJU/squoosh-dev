@@ -57,6 +57,11 @@
   "build": {
     "appId": "app.squoosh.desktop",
     "productName": "Squoosh-Desktop",
+    "compression": "maximum",
+    "electronLanguages": [
+      "en-US",
+      "zh-CN"
+    ],
     "directories": {
       "output": "dist",
       "buildResources": "electron/build-resources"
