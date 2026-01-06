@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest]
+        os: [windows-latest, macos-latest, ubuntu-latest]
     env:
       ELECTRON_MIRROR: https://npmmirror.com/mirrors/electron/
       ELECTRON_BUILDER_BINARIES_MIRROR: https://npmmirror.com/mirrors/electron-builder-binaries/
@@ -61,8 +61,9 @@ jobs:
           mapfile -t ASSETS < <(
             find dist -type f \
               ! -path '*/release-Squoosh-Desktop/*/win-unpacked/*' \
+              ! -name 'elevate.exe' \
               \( \
-                -name '*.exe' -o \
+                -name '*Setup*.exe' -o \
                 -name '*.dmg' -o \
                 -name '*.AppImage' -o \
                 -name '*.deb' \
