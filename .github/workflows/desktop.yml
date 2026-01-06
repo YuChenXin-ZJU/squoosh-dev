@@ -62,11 +62,10 @@ jobs:
             find dist -type f \
               ! -path '*/release-Squoosh-Desktop/*/win-unpacked/*' \
               \( \
-                -name 'Squoosh-Desktop.Setup.*.exe' -o \
-                -name 'Squoosh-Desktop.*.exe' -o \
-                -name 'Squoosh-Desktop-*.dmg' -o \
-                -name 'Squoosh-Desktop-*.AppImage' -o \
-                -name 'Squoosh-Desktop_*.deb' \
+                -name '*.exe' -o \
+                -name '*.dmg' -o \
+                -name '*.AppImage' -o \
+                -name '*.deb' \
               \)
           )
 
