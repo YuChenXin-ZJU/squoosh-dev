@@ -1,6 +1,6 @@
 # Squoosh-Desktop
 
-[![中文](https://img.shields.io/badge/README-中文-blue)](#中文) [![English](https://img.shields.io/badge/README-English-blue)](#english) [![Releases](https://img.shields.io/badge/Download-Releases-brightgreen)](https://github.com/YuChenXin-ZJU/squoosh-Desktop/releases)
+[![中文](https://img.shields.io/badge/README-中文-blue)](#中文) [![English](https://img.shields.io/badge/README-English-blue)](#english) [![Releases](https://img.shields.io/badge/Download-Releases-brightgreen)](https://github.com/YuChenXin-ZJU/Squoosh-Desktop/releases)
 
 ## 中文
 
@@ -45,13 +45,13 @@ Squoosh-Desktop 是一个离线优先的图片压缩/转码桌面应用（Window
 
 ### 与 Google 原版（Web）相比的优势
 
-| 项目 | Squoosh（Web） | Squoosh-Desktop |
-| --- | --- | --- |
-| 离线使用 | 受浏览器/缓存影响 | 安装即用，离线优先 |
-| 批量导出 | 依赖浏览器体验/实现差异 | 内置批量处理与打包下载 |
+| 项目       | Squoosh（Web）              | Squoosh-Desktop                     |
+| ---------- | --------------------------- | ----------------------------------- |
+| 离线使用   | 受浏览器/缓存影响           | 安装即用，离线优先                  |
+| 批量导出   | 依赖浏览器体验/实现差异     | 内置批量处理与打包下载              |
 | 隐私与合规 | 可能受网站统计/网络请求影响 | 本地处理为主，便于内网/离线环境使用 |
-| 系统集成 | 受浏览器文件选择限制 | 桌面应用入口更直接 |
-| 多平台分发 | 无安装包 | 提供 Windows / macOS / Linux 安装包 |
+| 系统集成   | 受浏览器文件选择限制        | 桌面应用入口更直接                  |
+| 多平台分发 | 无安装包                    | 提供 Windows / macOS / Linux 安装包 |
 
 ### 使用方法
 
@@ -145,12 +145,12 @@ Output:
 
 ### Advantages vs the original Squoosh (Web)
 
-| Item | Squoosh (Web) | Squoosh-Desktop |
-| --- | --- | --- |
-| Offline usage | depends on browser/cache | install & use, offline-first |
-| Batch export | varies by browser UX | built-in batch + zip download |
+| Item                          | Squoosh (Web)              | Squoosh-Desktop                 |
+| ----------------------------- | -------------------------- | ------------------------------- |
+| Offline usage                 | depends on browser/cache   | install & use, offline-first    |
+| Batch export                  | varies by browser UX       | built-in batch + zip download   |
 | Privacy / offline environment | website requests may apply | local-first, works well offline |
-| Distribution | no installers | Windows / macOS / Linux builds |
+| Distribution                  | no installers              | Windows / macOS / Linux builds  |
 
 ### Usage
 
