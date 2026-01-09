@@ -128,6 +128,7 @@ fn resolve_static_root(app: &tauri::AppHandle) -> Result<PathBuf, Box<dyn std::e
     Err("Missing static root".into())
 }
 
+#[cfg(feature = "embedded-assets")]
 fn response_for_bytes(path: &str, body: Vec<u8>) -> Result<Response, Box<dyn std::error::Error>> {
     let ext = Path::new(path)
         .extension()

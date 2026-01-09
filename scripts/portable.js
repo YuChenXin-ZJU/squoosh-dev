@@ -27,6 +27,8 @@ if (!fs.existsSync(buildDir)) {
 
 const cargoArgs = [
   'build',
+  '--manifest-path',
+  path.join(root, 'src-tauri', 'Cargo.toml'),
   '--release',
   '--features',
   'custom-protocol,embedded-assets',
