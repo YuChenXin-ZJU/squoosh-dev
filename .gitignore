@@ -5,12 +5,6 @@ node_modules
 build
 dist
 dist-*
-dist-desktop
-dist-desktop-*
-dist-desktop-out
-dist-desktop-out-*
-release-desktop
-release-desktop-*
 release-Squoosh-Desktop*
 src-tauri/target
 *.o
