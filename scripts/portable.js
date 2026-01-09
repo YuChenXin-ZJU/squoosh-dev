@@ -13,51 +13,37 @@ const productName = tauriConfig.package?.productName || 'Squoosh-Desktop';
 const version = tauriConfig.package?.version || '0.0.0';
 const exeName = `${productName}.exe`;
 
-const exePath = path.join(root, 'src-tauri', 'target', 'release', exeName);
-const buildDir = path.join(root, 'build');
 const releaseDir = path.join(root, 'release-Squoosh-Desktop');
-const portableDir = path.join(releaseDir, 'portable');
-const portableExe = path.join(portableDir, exeName);
-const portableBuild = path.join(portableDir, 'build');
-const zipPath = path.join(
+const portableExe = path.join(
   releaseDir,
-  `${productName}_${version}_x64_portable.zip`,
+  `${productName}_${version}_x64_portable.exe`,
 );
 
-if (!fs.existsSync(exePath)) {
-  console.error(`Missing ${exePath}. Run "npm run tauri:build" first.`);
-  process.exit(1);
-}
-
+const buildDir = path.join(root, 'build');
 if (!fs.existsSync(buildDir)) {
   console.error(`Missing ${buildDir}. Run "npm run build" first.`);
   process.exit(1);
 }
 
-fs.rmSync(portableDir, { recursive: true, force: true });
-fs.mkdirSync(portableDir, { recursive: true });
+const cargoArgs = [
+  'build',
+  '--release',
+  '--features',
+  'custom-protocol,embedded-assets',
+];
+const cargoResult = spawnSync('cargo', cargoArgs, { stdio: 'inherit' });
+if (cargoResult.status !== 0) {
+  console.error('Failed to build embedded portable executable.');
+  process.exit(cargoResult.status ?? 1);
+}
+
+const exePath = path.join(root, 'src-tauri', 'target', 'release', exeName);
+if (!fs.existsSync(exePath)) {
+  console.error(`Missing ${exePath}.`);
+  process.exit(1);
+}
+
+fs.mkdirSync(releaseDir, { recursive: true });
 fs.copyFileSync(exePath, portableExe);
-fs.cpSync(buildDir, portableBuild, { recursive: true });
 
-if (fs.existsSync(zipPath)) {
-  fs.rmSync(zipPath);
-}
-
-const zipResult = spawnSync(
-  'powershell',
-  [
-    '-NoProfile',
-    '-NonInteractive',
-    '-Command',
-    `Compress-Archive -Path "${portableDir}\\*" -DestinationPath "${zipPath}" -Force`,
-  ],
-  { stdio: 'inherit' },
-);
-
-if (zipResult.status !== 0) {
-  console.error('Failed to create portable zip archive.');
-  process.exit(zipResult.status ?? 1);
-}
-
-console.log(`Portable output: ${portableDir}`);
-console.log(`Portable zip: ${zipPath}`);
+console.log(`Portable output: ${portableExe}`);

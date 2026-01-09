@@ -1,10 +1,15 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+#[cfg(feature = "embedded-assets")]
+use include_dir::{include_dir, Dir};
 use percent_encoding::percent_decode_str;
 use std::fs;
 use std::path::{Component, Path, PathBuf};
 use tauri::http::{Request, Response, ResponseBuilder};
 use tauri::WindowUrl;
+
+#[cfg(feature = "embedded-assets")]
+static EMBEDDED_ASSETS: Dir = include_dir!("../build");
 
 fn normalize_relative_path(path: &str) -> Option<PathBuf> {
     let mut buf = PathBuf::new();
@@ -123,11 +128,23 @@ fn resolve_static_root(app: &tauri::AppHandle) -> Result<PathBuf, Box<dyn std::e
     Err("Missing static root".into())
 }
 
+fn response_for_bytes(path: &str, body: Vec<u8>) -> Result<Response, Box<dyn std::error::Error>> {
+    let ext = Path::new(path)
+        .extension()
+        .and_then(|value| value.to_str())
+        .unwrap_or("");
+    let content_type = content_type_for_ext(ext);
+    let mimetype = content_type.split(';').next().unwrap_or(content_type);
+    with_common_headers(ResponseBuilder::new().status(200).mimetype(mimetype))
+        .header("Content-Type", content_type)
+        .body(body)
+}
+
 fn serve_asset(
     app: &tauri::AppHandle,
     request: &Request,
 ) -> Result<Response, Box<dyn std::error::Error>> {
-    let static_root = resolve_static_root(app)?;
+    let static_root = resolve_static_root(app).ok();
 
     let mut path = request_path(request);
     if path == "/editor" {
@@ -140,25 +157,51 @@ fn serve_asset(
         path = "/index.html".to_string();
     }
 
-    let mut file_path = match safe_resolve_file_path(&static_root, &path) {
-        Some(path) => path,
-        None => return text_response(404, "Not Found"),
-    };
+    if let Some(ref static_root) = static_root {
+        let mut file_path = match safe_resolve_file_path(&static_root, &path) {
+            Some(path) => path,
+            None => return text_response(404, "Not Found"),
+        };
 
-    if file_path.is_dir() {
-        file_path = file_path.join("index.html");
+        if file_path.is_dir() {
+            file_path = file_path.join("index.html");
+        }
+
+        if file_path.exists() {
+            let bytes = fs::read(&file_path)?;
+            return file_response(&file_path, bytes);
+        }
     }
 
-    if file_path.exists() {
-        let bytes = fs::read(&file_path)?;
-        return file_response(&file_path, bytes);
+    #[cfg(feature = "embedded-assets")]
+    {
+        let mut embedded_path = path.clone();
+        if embedded_path.starts_with('/') {
+            embedded_path.remove(0);
+        }
+        if embedded_path.is_empty() {
+            embedded_path = "index.html".to_string();
+        }
+
+        if let Some(file) = EMBEDDED_ASSETS.get_file(&embedded_path) {
+            return response_for_bytes(&embedded_path, file.contents().to_vec());
+        }
     }
 
     if wants_html(request) {
-        if let Some(index_path) = safe_resolve_file_path(&static_root, "/index.html") {
-            if index_path.exists() {
-                let bytes = fs::read(&index_path)?;
-                return file_response(&index_path, bytes);
+        if let Some(ref static_root) = static_root {
+            if let Some(index_path) = safe_resolve_file_path(&static_root, "/index.html") {
+                if index_path.exists() {
+                    let bytes = fs::read(&index_path)?;
+                    return file_response(&index_path, bytes);
+                }
+            }
+        }
+
+        #[cfg(feature = "embedded-assets")]
+        {
+            if let Some(file) = EMBEDDED_ASSETS.get_file("index.html") {
+                return response_for_bytes("index.html", file.contents().to_vec());
             }
         }
     }

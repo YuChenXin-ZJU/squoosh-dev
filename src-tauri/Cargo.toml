@@ -10,8 +10,10 @@ edition = "2021"
 tauri-build = { version = "1", features = [] }
 
 [dependencies]
+include_dir = { version = "0.7", optional = true }
 percent-encoding = "2"
 tauri = { version = "1", features = [] }
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]
+embedded-assets = ["include_dir"]

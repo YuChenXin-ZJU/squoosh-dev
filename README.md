@@ -13,7 +13,7 @@ Squoosh-Desktop 是一个离线优先的图片压缩/转码桌面应用（Window
 从 Releases 下载最新版本：
 
 - Windows 安装版（NSIS）：`Squoosh-Desktop.Setup.*.exe`
-- Windows 免安装版（Portable）：`Squoosh-Desktop_*_portable.zip`
+- Windows 免安装版（Portable）：`Squoosh-Desktop_*_portable.exe`
 - macOS（DMG）：`Squoosh-Desktop-*.dmg`
 - Linux：`Squoosh-Desktop-*.AppImage` / `Squoosh-Desktop_*.deb`
 
@@ -113,7 +113,7 @@ This project is based on Google’s open-source Squoosh (with desktop packaging 
 Get the latest build from Releases:
 
 - Windows (NSIS installer): `Squoosh-Desktop.Setup.*.exe`
-- Windows (Portable): `Squoosh-Desktop_*_portable.zip`
+- Windows (Portable): `Squoosh-Desktop_*_portable.exe`
 - macOS (DMG): `Squoosh-Desktop-*.dmg`
 - Linux: `Squoosh-Desktop-*.AppImage` / `Squoosh-Desktop_*.deb`
 
